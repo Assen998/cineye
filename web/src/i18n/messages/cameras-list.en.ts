@@ -76,6 +76,7 @@ export default {
     saveAndStart: 'Save & Start',
     connection: 'Connection',
     onvifDiscover: 'ONVIF Auto Discover (Recommended)',
+    rtspDirect: 'RTSP Direct URL',
     rtspUrl: 'RTSP Stream URL',
     onvifHint: 'Enter IP, username and password to auto-discover the device and get the stream URL',
     rtspHint: 'Paste a full RTSP URL that plays correctly (including credentials); connectivity is auto-tested before saving',

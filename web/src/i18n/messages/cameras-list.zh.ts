@@ -76,6 +76,7 @@ export default {
     saveAndStart: '保存并启动',
     connection: '连接方式',
     onvifDiscover: 'ONVIF 自动发现（推荐）',
+    rtspDirect: 'RTSP 地址直连',
     rtspUrl: 'RTSP 流地址',
     onvifHint: '填写 IP、用户名、密码后自动发现设备并获取流地址',
     rtspHint: '直接粘贴可正常播放的完整 RTSP 地址（含账号密码），保存前自动实测连通性',

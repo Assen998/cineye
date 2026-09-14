@@ -13,7 +13,7 @@
         <el-form-item :label="t('camerasAdd.protocol')" prop="protocol">
           <el-radio-group v-model="cameraForm.protocol" :disabled="isEditMode" style="display: flex; gap: 16px;">
             <el-radio value="onvif">{{ t('camerasAdd.onvifAuto') }}</el-radio>
-            <el-radio value="rtsp">{{ t('camerasAdd.rtspUrl') }}</el-radio>
+            <el-radio value="rtsp">{{ t('camerasAdd.rtspDirect') }}</el-radio>
           </el-radio-group>
           <p class="form-hint" v-if="isEditMode">{{ t('camerasAdd.protocolLocked') }}</p>
           <p class="form-hint" v-else-if="!isRtspMode">{{ t('camerasAdd.onvifHint') }}</p>

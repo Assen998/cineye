@@ -12,6 +12,7 @@ export default {
 
     protocol: '连接方式',
     onvifAuto: 'ONVIF 自动发现（推荐）',
+    rtspDirect: 'RTSP 地址直连',
     rtspUrl: 'RTSP 流地址',
     protocolLocked: '连接方式在添加时确定，不可更换；如需更换请删除该摄像头后重新添加',
     onvifHint: '填写 IP、用户名、密码后自动发现设备并获取流地址',

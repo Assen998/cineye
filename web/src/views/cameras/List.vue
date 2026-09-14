@@ -204,7 +204,7 @@
         <el-form-item :label="t('camerasList.connection')">
           <el-radio-group v-model="cameraForm.protocol" style="display: flex; gap: 16px;">
             <el-radio value="onvif">{{ t('camerasList.onvifDiscover') }}</el-radio>
-            <el-radio value="rtsp">{{ t('camerasList.rtspUrl') }}</el-radio>
+            <el-radio value="rtsp">{{ t('camerasList.rtspDirect') }}</el-radio>
           </el-radio-group>
           <p class="form-hint" v-if="!isRtspMode">{{ t('camerasList.onvifHint') }}</p>
           <p class="form-hint" v-else>{{ t('camerasList.rtspHint') }}</p>

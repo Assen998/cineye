@@ -12,6 +12,7 @@ export default {
 
     protocol: 'Connection Method',
     onvifAuto: 'ONVIF Auto-Discovery (Recommended)',
+    rtspDirect: 'RTSP Direct URL',
     rtspUrl: 'RTSP Stream URL',
     protocolLocked: 'The connection method is fixed when the camera is added and cannot be changed; to change it, delete this camera and add it again',
     onvifHint: 'Fill in IP, username and password to auto-discover the device and get the stream address',
