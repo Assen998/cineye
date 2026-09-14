@@ -32,7 +32,7 @@ export default {
     namePlaceholderRtsp: '例如：门口摄像头',
     namePlaceholderAuto: '自动填充：厂商+型号+IP后缀',
 
-    rtspPlaceholder: 'rtsp://用户名:密码@192.168.1.64:554/Streaming/Channels/101',
+    rtspPlaceholder: "rtsp://用户名:密码{'@'}192.168.1.64:554/Streaming/Channels/101",
     rtspPasteHint: '粘贴可正常播放的完整地址；无账号密码的流直接填 rtsp://IP:端口/路径',
     rtspEditHint: '编辑时密码不回显：不粘贴账号密码则沿用原账号；修改 IP/端口/路径后保存即重连',
 

@@ -89,7 +89,7 @@ export default {
     cameraName: 'Camera Name',
     namePlaceholder: 'e.g. Front Door Camera',
     nameAutoFillPlaceholder: 'Auto-filled: manufacturer + model + IP suffix',
-    rtspPlaceholder: 'rtsp://username:password@192.168.1.64:554/Streaming/Channels/101',
+    rtspPlaceholder: "rtsp://username:password{'@'}192.168.1.64:554/Streaming/Channels/101",
     rtspPasteHint: 'Paste a full URL that plays correctly; for streams without credentials use rtsp://IP:port/path',
     deviceInfo: 'Device Info',
     manufacturerModel: 'Manufacturer/Model',

@@ -89,7 +89,7 @@ export default {
     cameraName: '摄像头名称',
     namePlaceholder: '例如：门口摄像头',
     nameAutoFillPlaceholder: '自动填充：厂商+型号+IP后缀',
-    rtspPlaceholder: 'rtsp://用户名:密码@192.168.1.64:554/Streaming/Channels/101',
+    rtspPlaceholder: "rtsp://用户名:密码{'@'}192.168.1.64:554/Streaming/Channels/101",
     rtspPasteHint: '粘贴可正常播放的完整地址；无账号密码的流直接填 rtsp://IP:端口/路径',
     deviceInfo: '设备信息',
     manufacturerModel: '厂商/型号',

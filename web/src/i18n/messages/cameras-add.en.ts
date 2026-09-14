@@ -32,7 +32,7 @@ export default {
     namePlaceholderRtsp: 'e.g. Entrance Camera',
     namePlaceholderAuto: 'Auto-filled: manufacturer + model + IP suffix',
 
-    rtspPlaceholder: 'rtsp://username:password@192.168.1.64:554/Streaming/Channels/101',
+    rtspPlaceholder: "rtsp://username:password{'@'}192.168.1.64:554/Streaming/Channels/101",
     rtspPasteHint: 'Paste a full, playable address; for streams without credentials, just use rtsp://IP:port/path',
     rtspEditHint: 'Password is not shown in edit mode: leave credentials empty to keep the original account; after changing IP/port/path, saving reconnects',
 
