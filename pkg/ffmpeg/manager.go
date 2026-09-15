@@ -29,6 +29,8 @@ type StreamOptions struct {
 	OutputDir       string
 	OnSegment       func(cameraID uint, segment *SegmentInfo)
 	OnError         func(error)
+	// OnSegmentStart 在新片段的 ffmpeg 进程确认正常运行（真正连上流源）时调用
+	OnSegmentStart func()
 
 	NoRecord bool
 
@@ -54,6 +56,10 @@ type Stream struct {
 	processedSegs map[string]bool
 	processedMu   sync.Mutex
 	csvWatcher    chan struct{}
+
+	segExited bool // 当前片段的 ffmpeg 进程已退出（受 mu 保护）
+	segRunID  int  // 每个片段自增，用于作废旧片段残留的存活检查
+	live      bool // 当前片段已确认正常运行（受 mu 保护）
 
 	restartRequested bool
 }
@@ -117,6 +123,7 @@ func (s *Stream) run() {
 	defer func() {
 		s.mu.Lock()
 		s.running = false
+		s.live = false
 		close(s.doneChan)
 		s.mu.Unlock()
 	}()
@@ -130,6 +137,9 @@ func (s *Stream) run() {
 				if s.ctx.Err() == context.Canceled {
 					return
 				}
+				s.mu.Lock()
+				s.live = false
+				s.mu.Unlock()
 				logrus.Errorf("camera %d recording segment error: %v", s.opts.CameraID, err)
 				if s.opts.OnError != nil {
 					s.opts.OnError(err)
@@ -212,6 +222,9 @@ func (s *Stream) runSegment() error {
 
 	s.mu.Lock()
 	s.cmd = exec.CommandContext(s.ctx, "ffmpeg", args...)
+	s.segExited = false
+	s.segRunID++
+	runID := s.segRunID
 	s.mu.Unlock()
 
 	stderr, _ := s.cmd.StderrPipe()
@@ -226,8 +239,28 @@ func (s *Stream) runSegment() error {
 
 	s.startCSVWatcher(indexFile)
 
+	// 存活确认：启动 5 秒后进程仍存活，视为真正连上流源
+	// （流源不可达时 ffmpeg 通常 1~2 秒内即报错退出）
+	go func() {
+		time.Sleep(5 * time.Second)
+		s.mu.Lock()
+		ok := s.running && !s.segExited && s.segRunID == runID
+		if ok {
+			s.live = true
+		}
+		cb := s.opts.OnSegmentStart
+		s.mu.Unlock()
+		if ok && cb != nil {
+			cb()
+		}
+	}()
+
 	err := s.cmd.Wait()
 	s.stopCSVWatcher()
+
+	s.mu.Lock()
+	s.segExited = true
+	s.mu.Unlock()
 
 	s.mu.Lock()
 	wasRestart := s.restartRequested
@@ -398,6 +431,7 @@ func (s *Stream) Stop() error {
 	if s.cmd != nil {
 		proc = s.cmd.Process
 	}
+	s.live = false
 	s.mu.Unlock()
 
 	s.cancel()
@@ -444,6 +478,14 @@ func (s *Stream) IsRunning() bool {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	return s.running
+}
+
+// IsLive 报告当前片段是否已确认正常运行（真正连上流源）。
+// 流源不可达时（自动重试中）返回 false，区别于 IsRunning（重试管线存活即 true）。
+func (s *Stream) IsLive() bool {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.running && s.live
 }
 
 func (s *Stream) IsHealthy() bool {

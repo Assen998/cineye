@@ -234,12 +234,12 @@ func (m *CameraManager) runCamera(id uint) {
 			return
 		default:
 			if err := m.connectCamera(inst); err != nil {
-				inst.setError(err.Error())
+				m.updateCameraStatus(cam.ID, models.CameraStatusError, conciseStreamError(err))
 				inst.ReconnectCnt++
 
 				if inst.ReconnectCnt >= m.cfg.Camera.MaxReconnect {
 					logrus.Errorf("camera %s reached max reconnect attempts, giving up", cam.Name)
-					m.updateCameraStatus(cam.ID, models.CameraStatusError, err.Error())
+					m.updateCameraStatus(cam.ID, models.CameraStatusError, conciseStreamError(err))
 					return
 				}
 
@@ -460,8 +460,15 @@ func (m *CameraManager) connectCamera(inst *CameraInstance) error {
 		SegmentDuration: m.localStorage().SegmentDuration,
 		OutputDir:       m.getCameraStoragePath(cam.ID),
 		OnSegment:       m.onSegmentComplete,
-		OnError:         func(err error) { inst.setError(err.Error()) },
-		RecordOnly:      true,
+		// 拉流失败（流源不可达/中断）：把 error 状态持久化到 DB，列表状态实时显示"异常"
+		OnError: func(err error) {
+			m.updateCameraStatus(cam.ID, models.CameraStatusError, conciseStreamError(err))
+		},
+		// 新片段确认正常运行（真正连上流源）：恢复 online
+		OnSegmentStart: func() {
+			m.updateCameraStatus(cam.ID, models.CameraStatusOnline, "")
+		},
+		RecordOnly: true,
 	})
 	if err != nil {
 		return fmt.Errorf("failed to create recording stream: %w", err)
@@ -1268,11 +1275,14 @@ func (m *CameraManager) PTZCapability(cameraID uint) *bool {
 }
 
 func (m *CameraManager) updateCameraStatus(id uint, status, errMsg string) {
-	m.db.Model(&models.Camera{}).Where("id = ?", id).Updates(map[string]interface{}{
-		"status":      status,
-		"error_msg":   errMsg,
-		"last_online": func() *time.Time { t := time.Now(); return &t }(),
-	})
+	updates := map[string]interface{}{
+		"status":    status,
+		"error_msg": errMsg,
+	}
+	if status == models.CameraStatusOnline {
+		updates["last_online"] = time.Now()
+	}
+	m.db.Model(&models.Camera{}).Where("id = ?", id).Updates(updates)
 
 	m.mu.RLock()
 	if inst, ok := m.cameras[id]; ok {
@@ -1280,6 +1290,37 @@ func (m *CameraManager) updateCameraStatus(id uint, status, errMsg string) {
 		inst.LastError = errMsg
 	}
 	m.mu.RUnlock()
+}
+
+// conciseStreamError 提取简短的流错误信息：ffmpeg 错误输出最后一条非空行通常是致命错误
+// （如 "rtsp://...: Connection refused"），避免把整段 stderr 尾巴塞进 DB / API。
+// 错误格式为 "ffmpeg exited abnormally: exit status 1 (stderr tail: ...)"，
+// 取 stderr 尾部（剥掉包装括号）的最后一行。
+func conciseStreamError(err error) string {
+	msg := err.Error()
+	const marker = "(stderr tail: "
+	if i := strings.Index(msg, marker); i >= 0 {
+		tail := strings.TrimSuffix(msg[i+len(marker):], ")")
+		lines := strings.Split(tail, "\n")
+		for j := len(lines) - 1; j >= 0; j-- {
+			if t := strings.TrimSpace(lines[j]); t != "" {
+				if len(t) > 200 {
+					t = t[len(t)-200:]
+				}
+				return t
+			}
+		}
+	}
+	lines := strings.Split(msg, "\n")
+	for j := len(lines) - 1; j >= 0; j-- {
+		if t := strings.TrimSpace(lines[j]); t != "" {
+			if len(t) > 200 {
+				t = t[len(t)-200:]
+			}
+			return t
+		}
+	}
+	return msg
 }
 
 func (inst *CameraInstance) stop() (*ffmpeg.Stream, *ffmpeg.PreviewStream) {

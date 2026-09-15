@@ -1060,7 +1060,7 @@ func (s *Server) getCameraStatus(c *gin.Context) {
 		"status":          inst.Status,
 		"last_error":      inst.LastError,
 		"reconnect_count": inst.ReconnectCnt,
-		"is_streaming":    inst.Stream != nil && inst.Stream.IsRunning(),
+		"is_streaming":    inst.Stream != nil && inst.Stream.IsLive(),
 	})
 }
 
