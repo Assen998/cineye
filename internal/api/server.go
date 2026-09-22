@@ -32,15 +32,15 @@ import (
 	"golang.org/x/crypto/bcrypt"
 	"gopkg.in/yaml.v3"
 
-	embedui "github.com/yourorg/surveillance-system"
-	"github.com/yourorg/surveillance-system/internal/alert"
-	"github.com/yourorg/surveillance-system/internal/camera"
-	"github.com/yourorg/surveillance-system/internal/config"
-	"github.com/yourorg/surveillance-system/internal/database"
-	"github.com/yourorg/surveillance-system/internal/models"
-	"github.com/yourorg/surveillance-system/internal/storage"
-	"github.com/yourorg/surveillance-system/pkg/minio"
-	"github.com/yourorg/surveillance-system/pkg/webdav"
+	embedui "github.com/Assen998/cineye"
+	"github.com/Assen998/cineye/internal/alert"
+	"github.com/Assen998/cineye/internal/camera"
+	"github.com/Assen998/cineye/internal/config"
+	"github.com/Assen998/cineye/internal/database"
+	"github.com/Assen998/cineye/internal/models"
+	"github.com/Assen998/cineye/internal/storage"
+	"github.com/Assen998/cineye/pkg/minio"
+	"github.com/Assen998/cineye/pkg/webdav"
 )
 
 type Server struct {
@@ -334,7 +334,7 @@ func (s *Server) corsMiddleware() gin.HandlerFunc {
 	}
 }
 
-var authSecret = []byte("surveillance-system-secret-change-in-production")
+var authSecret = []byte("cineye-secret-change-in-production")
 
 const tokenTTL = 24 * time.Hour
 
@@ -2716,7 +2716,7 @@ func (s *Server) deleteBackup(c *gin.Context) {
 
 const (
 	defaultUpdateAPIBase = "https://api.github.com"
-	defaultGitHubRepo    = "Assen998/surveillance-system"
+	defaultGitHubRepo    = "Assen998/cineye"
 )
 
 func (s *Server) updateEndpoint() (string, string) {
@@ -2798,7 +2798,7 @@ func (s *Server) fetchLatestRelease() (*githubRelease, error) {
 func (r *githubRelease) assetForCurrentPlatform() *githubReleaseAsset {
 	ver := strings.TrimPrefix(r.TagName, "v")
 	suffix := fmt.Sprintf("-%s-%s.tar.gz", runtime.GOOS, runtime.GOARCH)
-	wantName := fmt.Sprintf("surveillance-system-%s%s", ver, suffix)
+	wantName := fmt.Sprintf("cineye-%s%s", ver, suffix)
 	for i := range r.Assets {
 		if r.Assets[i].Name == wantName {
 			return &r.Assets[i]
@@ -2810,7 +2810,7 @@ func (r *githubRelease) assetForCurrentPlatform() *githubReleaseAsset {
 		}
 	}
 	if runtime.GOARCH == "arm" {
-		prefix := fmt.Sprintf("surveillance-system-%s-%s-arm", ver, runtime.GOOS)
+		prefix := fmt.Sprintf("cineye-%s-%s-arm", ver, runtime.GOOS)
 		for i := range r.Assets {
 			if strings.HasPrefix(r.Assets[i].Name, prefix) && strings.HasSuffix(r.Assets[i].Name, ".tar.gz") {
 				return &r.Assets[i]

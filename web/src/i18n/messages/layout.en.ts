@@ -1,6 +1,6 @@
 export default {
   layout: {
-    appName: 'Surveillance System',
+    appName: 'Cineye',
     system: 'Surveillance',
     logout: 'Log out',
     language: 'Language',

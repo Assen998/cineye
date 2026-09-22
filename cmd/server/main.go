@@ -15,15 +15,15 @@ import (
 	"github.com/sirupsen/logrus"
 	"gopkg.in/natefinch/lumberjack.v2"
 
-	"github.com/yourorg/surveillance-system/internal/alert"
-	"github.com/yourorg/surveillance-system/internal/api"
-	"github.com/yourorg/surveillance-system/internal/camera"
-	"github.com/yourorg/surveillance-system/internal/config"
-	"github.com/yourorg/surveillance-system/internal/database"
-	"github.com/yourorg/surveillance-system/internal/models"
-	"github.com/yourorg/surveillance-system/internal/onvifevent"
-	"github.com/yourorg/surveillance-system/internal/storage"
-	"github.com/yourorg/surveillance-system/pkg/ffmpeg"
+	"github.com/Assen998/cineye/internal/alert"
+	"github.com/Assen998/cineye/internal/api"
+	"github.com/Assen998/cineye/internal/camera"
+	"github.com/Assen998/cineye/internal/config"
+	"github.com/Assen998/cineye/internal/database"
+	"github.com/Assen998/cineye/internal/models"
+	"github.com/Assen998/cineye/internal/onvifevent"
+	"github.com/Assen998/cineye/internal/storage"
+	"github.com/Assen998/cineye/pkg/ffmpeg"
 )
 
 var (
@@ -45,7 +45,7 @@ func main() {
 
 	initLogging(cfg)
 
-	logrus.Infof("starting surveillance system v%s (build: %s, commit: %s)", Version, BuildTime, GitCommit)
+	logrus.Infof("starting cineye v%s (build: %s, commit: %s)", Version, BuildTime, GitCommit)
 
 	if err := database.Init(cfg); err != nil {
 		logrus.Fatalf("failed to initialize database: %v", err)

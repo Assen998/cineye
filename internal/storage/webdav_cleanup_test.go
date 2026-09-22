@@ -9,7 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/yourorg/surveillance-system/internal/config"
+	"github.com/Assen998/cineye/internal/config"
 )
 
 type fakeWebdavServer struct {

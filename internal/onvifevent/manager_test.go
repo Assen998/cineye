@@ -3,8 +3,8 @@ package onvifevent
 import (
 	"testing"
 
-	"github.com/yourorg/surveillance-system/internal/models"
-	"github.com/yourorg/surveillance-system/pkg/onvif"
+	"github.com/Assen998/cineye/internal/models"
+	"github.com/Assen998/cineye/pkg/onvif"
 )
 
 func TestMapTopicToAlert(t *testing.T) {

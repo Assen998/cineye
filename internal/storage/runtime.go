@@ -3,7 +3,7 @@ package storage
 import (
 	"sync"
 
-	"github.com/yourorg/surveillance-system/internal/config"
+	"github.com/Assen998/cineye/internal/config"
 )
 
 type RuntimeStorage struct {

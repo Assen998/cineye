@@ -9,9 +9,9 @@ import (
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
 
+	"github.com/Assen998/cineye/internal/config"
+	"github.com/Assen998/cineye/internal/models"
 	"github.com/sirupsen/logrus"
-	"github.com/yourorg/surveillance-system/internal/config"
-	"github.com/yourorg/surveillance-system/internal/models"
 )
 
 var DB *gorm.DB

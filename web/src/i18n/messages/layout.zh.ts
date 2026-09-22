@@ -1,6 +1,6 @@
 export default {
   layout: {
-    appName: '监控录像系统',
+    appName: 'Cineye',
     system: '监控系统',
     logout: '退出登录',
     language: '语言',

@@ -9,12 +9,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Assen998/cineye/internal/config"
+	"github.com/Assen998/cineye/internal/database"
+	"github.com/Assen998/cineye/internal/models"
+	"github.com/Assen998/cineye/pkg/minio"
+	"github.com/Assen998/cineye/pkg/webdav"
 	"github.com/gin-gonic/gin"
-	"github.com/yourorg/surveillance-system/internal/config"
-	"github.com/yourorg/surveillance-system/internal/database"
-	"github.com/yourorg/surveillance-system/internal/models"
-	"github.com/yourorg/surveillance-system/pkg/minio"
-	"github.com/yourorg/surveillance-system/pkg/webdav"
 
 	"golang.org/x/crypto/bcrypt"
 )

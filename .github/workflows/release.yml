@@ -59,8 +59,8 @@ jobs:
           GOVERSION: ${{ github.ref_name }}
         run: |
           VERSION="${GOVERSION#v}"
-          BIN="surveillance-server"
-          if [ "$GOOS" = "windows" ]; then BIN="surveillance-server.exe"; fi
+          BIN="cineye"
+          if [ "$GOOS" = "windows" ]; then BIN="cineye.exe"; fi
           go build \
             -trimpath \
             -ldflags "-s -w -X main.Version=${VERSION} -X main.BuildTime='${GITHUB_RUN_AT}' -X main.GitCommit='${GITHUB_SHA::12}'" \
@@ -71,8 +71,8 @@ jobs:
           # 压缩包名带版本号（便于区分下载）；包内目录名不带版本号（稳定路径）：
           # 升级时新版直接解压覆盖同名目录即可 —— data/、recordings/ 自动保留，
           # systemd 单元 / 工作目录等引用无需改动。
-          NAME="surveillance-system-${VERSION}-${GOOS}-${GOARCH}${GOARM:+-armv${GOARM}}"
-          STAGE="surveillance-system-${GOOS}-${GOARCH}${GOARM:+-armv${GOARM}}"
+          NAME="cineye-${VERSION}-${GOOS}-${GOARCH}${GOARM:+-armv${GOARM}}"
+          STAGE="cineye-${GOOS}-${GOARCH}${GOARM:+-armv${GOARM}}"
           mkdir -p "${STAGE}"
           cp "${BIN}" "${STAGE}/"
           cp configs/config.yaml "${STAGE}/config.yaml"
@@ -89,7 +89,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: surveillance-system-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.goarm }}
+          name: cineye-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.goarm }}
           path: ${{ env.ARTIFACT }}
           if-no-files-found: error
 

@@ -1,4 +1,4 @@
-module github.com/yourorg/surveillance-system
+module github.com/Assen998/cineye
 
 go 1.24.0
 

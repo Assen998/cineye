@@ -1,11 +1,11 @@
 #!/bin/bash
 #
-# Surveillance System one-click installer (Linux, systemd + single binary)
-# 监控录像系统一键安装脚本（Linux，systemd + 单文件二进制）
+# Cineye one-click installer (Linux, systemd + single binary)
+# Cineye 监控录像系统一键安装脚本（Linux，systemd + 单文件二进制）
 #
 # Usage / 用法:
 #   一行式安装（无需克隆仓库）:
-#     curl -fsSL https://raw.githubusercontent.com/Assen998/surveillance-system/main/deployments/deploy.sh | sudo bash
+#     curl -fsSL https://raw.githubusercontent.com/Assen998/cineye/main/deployments/deploy.sh | sudo bash
 #   克隆仓库后运行:
 #     git clone https://github.com/Assen998/surveillance-system.git && cd surveillance-system
 #     sudo bash deployments/deploy.sh [local binary path / 本地二进制路径]
@@ -14,7 +14,7 @@
 #   sudo bash deployments/deploy.sh --uninstall
 #
 # Install locations / 安装位置:
-#   /opt/surveillance/surveillance-server
+#   /opt/cineye/cineye
 #   /opt/surveillance/configs/config.yaml
 #   /opt/surveillance/data|recordings|logs
 #   /etc/systemd/system/surveillance.service
@@ -29,8 +29,8 @@
 set -e
 
 REPO="Assen998/surveillance-system"
-INSTALL_DIR="/opt/surveillance"
-SERVICE_NAME="surveillance"
+INSTALL_DIR="/opt/cineye"
+SERVICE_NAME="cineye"
 SERVICE_FILE="/etc/systemd/system/${SERVICE_NAME}.service"
 
 # ---------- i18n ----------
@@ -55,7 +55,7 @@ T() {
                 download)       text="Downloading %s asset %s ..." ;;
                 download_fail)  text="Download failed: %s" ;;
                 extract_fail)   text="Extraction failed" ;;
-                pkg_bad)        text="Asset package structure invalid, surveillance-server binary not found" ;;
+                pkg_bad)        text="Asset package structure invalid, cineye binary not found" ;;
                 install_to)     text="Installing to %s ..." ;;
                 keep_cfg)       text="Existing config found, keeping current config.yaml (not overwritten)" ;;
                 gen_cfg)        text="Generated default config %s" ;;
@@ -70,7 +70,7 @@ T() {
                 web_url)        text="Web console: http://%s:%s" ;;
                 hints)          text="Common commands:" ;;
                 hint_status)    text="  status:     systemctl status $SERVICE_NAME" ;;
-                hint_logs)      text="  logs:       journalctl -u $SERVICE_NAME -f   (or tail -f $INSTALL_DIR/logs/surveillance.log)" ;;
+                hint_logs)      text="  logs:       journalctl -u $SERVICE_NAME -f   (or tail -f $INSTALL_DIR/logs/cineye.log)" ;;
                 hint_uninstall) text="  uninstall:  sudo bash <this-script> --uninstall" ;;
             esac ;;
         *)
@@ -90,7 +90,7 @@ T() {
                 download)       text="下载 %s 的 %s ..." ;;
                 download_fail)  text="下载失败: %s" ;;
                 extract_fail)   text="解压失败" ;;
-                pkg_bad)        text="资产包结构异常，未找到 surveillance-server 可执行文件" ;;
+                pkg_bad)        text="资产包结构异常，未找到 cineye 可执行文件" ;;
                 install_to)     text="安装到 %s ..." ;;
                 keep_cfg)       text="检测到已有配置，保留原 config.yaml（不覆盖）" ;;
                 gen_cfg)        text="已生成默认配置 %s" ;;
@@ -105,7 +105,7 @@ T() {
                 web_url)        text="Web 控制台: http://%s:%s" ;;
                 hints)          text="常用命令:" ;;
                 hint_status)    text="  查看状态   systemctl status $SERVICE_NAME" ;;
-                hint_logs)      text="  查看日志   journalctl -u $SERVICE_NAME -f   或 tail -f $INSTALL_DIR/logs/surveillance.log" ;;
+                hint_logs)      text="  查看日志   journalctl -u $SERVICE_NAME -f   或 tail -f $INSTALL_DIR/logs/cineye.log" ;;
                 hint_uninstall) text="  卸载       sudo bash <本脚本> --uninstall" ;;
             esac ;;
     esac
@@ -225,13 +225,13 @@ else
     }
     tar xzf "$TMP_DIR/pkg.tar.gz" -C "$TMP_DIR" || { rm -rf "$TMP_DIR"; log_error extract_fail; exit 1; }
     PKG_DIR=$(find "$TMP_DIR" -maxdepth 1 -type d -name "surveillance-system-linux-*" | head -1)
-    if [[ ! -f "$PKG_DIR/surveillance-server" ]]; then
+    if [[ ! -f "$PKG_DIR/cineye" ]]; then
         rm -rf "$TMP_DIR"
         log_error pkg_bad
         exit 1
     fi
     ASSET_CONFIG="$PKG_DIR/config.yaml"
-    BINARY="$PKG_DIR/surveillance-server"
+    BINARY="$PKG_DIR/cineye"
 fi
 
 # ---------- 端口选择（仅首次安装生成配置时）----------
@@ -320,7 +320,7 @@ alert:
 logging:
     level: info
     format: json
-    output: /opt/surveillance/logs/surveillance.log
+    output: /opt/surveillance/logs/cineye.log
     max_size: 100
     max_backups: 30
     max_age: 30
@@ -336,12 +336,12 @@ EOF
     log_info gen_cfg "$INSTALL_DIR/configs/config.yaml"
 fi
 
-install -m 755 "$BINARY" "$INSTALL_DIR/surveillance-server"
+install -m 755 "$BINARY" "$INSTALL_DIR/cineye"
 [[ -n "${TMP_DIR:-}" ]] && rm -rf "$TMP_DIR"
 
 sed -i -e 's|path: ./data/surveillance.db|path: /opt/surveillance/data/surveillance.db|' \
        -e 's|root_path: ./recordings|root_path: /opt/surveillance/recordings|' \
-       -e 's|output: ./logs/surveillance.log|output: /opt/surveillance/logs/surveillance.log|' \
+       -e 's|output: ./logs/cineye.log|output: /opt/surveillance/logs/cineye.log|' \
        "$INSTALL_DIR/configs/config.yaml" || true
 
 # ---------- systemd ----------
@@ -354,7 +354,7 @@ Wants=network-online.target
 [Service]
 Type=simple
 WorkingDirectory=$INSTALL_DIR
-ExecStart=$INSTALL_DIR/surveillance-server
+ExecStart=$INSTALL_DIR/cineye
 Restart=always
 RestartSec=5
 LimitNOFILE=65536

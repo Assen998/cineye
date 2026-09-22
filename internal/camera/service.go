@@ -13,15 +13,15 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Assen998/cineye/internal/config"
+	"github.com/Assen998/cineye/internal/database"
+	"github.com/Assen998/cineye/internal/models"
+	"github.com/Assen998/cineye/internal/storage"
+	"github.com/Assen998/cineye/pkg/ffmpeg"
+	"github.com/Assen998/cineye/pkg/minio"
+	"github.com/Assen998/cineye/pkg/onvif"
+	"github.com/Assen998/cineye/pkg/webdav"
 	"github.com/sirupsen/logrus"
-	"github.com/yourorg/surveillance-system/internal/config"
-	"github.com/yourorg/surveillance-system/internal/database"
-	"github.com/yourorg/surveillance-system/internal/models"
-	"github.com/yourorg/surveillance-system/internal/storage"
-	"github.com/yourorg/surveillance-system/pkg/ffmpeg"
-	"github.com/yourorg/surveillance-system/pkg/minio"
-	"github.com/yourorg/surveillance-system/pkg/onvif"
-	"github.com/yourorg/surveillance-system/pkg/webdav"
 	"gorm.io/gorm"
 )
 

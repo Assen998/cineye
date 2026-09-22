@@ -1,4 +1,4 @@
-# 监控录像系统
+# Cineye · 监控录像系统
 
 一个基于 Go + Vue 3 的视频监控与录像管理系统，支持多路摄像头接入、实时预览、历史回放、录像存储、报警推送与用户权限管理。
 
@@ -109,41 +109,41 @@ sudo dnf install -y ffmpeg
 **一行式安装**（无需克隆仓库；启动前会先询问选择语言，首次安装再询问端口）：
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Assen998/surveillance-system/main/deployments/deploy.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/Assen998/cineye/main/deployments/deploy.sh | sudo bash
 ```
 
 或克隆仓库后运行（效果相同，便于查看脚本）：
 
 ```bash
-git clone https://github.com/Assen998/surveillance-system.git
-cd surveillance-system
+git clone https://github.com/Assen998/cineye.git
+cd cineye
 sudo bash deployments/deploy.sh        # 自动下载当前平台的最新 Release 资产
 # 本地二进制安装：
-sudo bash deployments/deploy.sh /path/to/surveillance-server
-# 卸载（数据保留，彻底删除需手动 rm -rf /opt/surveillance）：
+sudo bash deployments/deploy.sh /path/to/cineye
+# 卸载（数据保留，彻底删除需手动 rm -rf /opt/cineye）：
 sudo bash deployments/deploy.sh --uninstall
 ```
 
 - 自动识别架构（amd64 / arm64 / armv7），下载最新 Release 中对应的资产包
 - **首次安装时可自定义端口**：脚本依次询问 HTTP 端口（默认 `8080`）与 WebSocket 端口（默认 `8081`），带合法性与占用检查，写入生成的 `config.yaml`；已有配置时不询问、不改动
-- 安装到 `/opt/surveillance`；首次安装自动生成 `config.yaml`，**已有配置始终保留、不覆盖**
-- 自动创建 `surveillance` systemd 服务：开机自启、崩溃自动重启
+- 安装到 `/opt/cineye`；首次安装自动生成 `config.yaml`，**已有配置始终保留、不覆盖**
+- 自动创建 `cineye` systemd 服务：开机自启、崩溃自动重启
 - 无法直连 GitHub 时通过代理下载：`sudo env http_proxy=http://<代理地址>:<端口> https_proxy=http://<代理地址>:<端口> bash deployments/deploy.sh`（一行式同理，`curl` 前加同样的 `http_proxy=...` 即可）
 - 非交互（管道/CI）运行自动按系统语言选择；可用 `DEPLOY_LANG=zh|en` 强制指定；端口可用 `SURVEILLANCE_HTTP_PORT` / `SURVEILLANCE_WS_PORT` 指定
 
 ### 方式二：下载发行版（无需编译）
 
-到 [GitHub Releases](https://github.com/Assen998/surveillance-system/releases) 下载对应平台压缩包（如 `surveillance-system-1.5.0-linux-arm64.tar.gz`）。解压后得到一个**不带版本号的稳定目录**（如 `surveillance-system-linux-arm64/`）：
+到 [GitHub Releases](https://github.com/Assen998/cineye/releases) 下载对应平台压缩包（如 `cineye-1.5.0-linux-arm64.tar.gz`）。解压后得到一个**不带版本号的稳定目录**（如 `cineye-linux-arm64/`）：
 
 ```
-surveillance-server         # 单二进制（前端已内嵌）
+cineye                  # 单二进制（前端已内嵌）
 config.yaml                 # 默认配置
 README.md
 ```
 
 ```bash
-cd surveillance-system-linux-arm64
-./surveillance-server        # 自动读取同目录 config.yaml
+cd cineye-linux-arm64
+./cineye        # 自动读取同目录 config.yaml
 ```
 
 ### 方式三：源码构建
@@ -151,25 +151,25 @@ cd surveillance-system-linux-arm64
 前端构建产物通过 Go 的 `go:embed` 直接嵌入后端二进制，最终产出**单个可执行文件**：
 
 ```bash
-cd surveillance-system
+cd cineye
 
 # 1) 先构建前端（生成 web/dist，供 go:embed 嵌入）
 cd web && npm install && npm run build && cd ..
 
 # 2) 再构建后端（自动嵌入前端 → 单二进制）
-go build -o surveillance-server ./cmd/server
+go build -o cineye ./cmd/server
 ```
 
 交叉编译（零 CGO，纯静态，支持 linux/windows/darwin × amd64/arm64 等）：
 
 ```bash
-CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o surveillance-server ./cmd/server
+CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o cineye ./cmd/server
 ```
 
 ### 首次运行（重要）
 
 ```bash
-./surveillance-server
+./cineye
 ```
 
 启动后浏览器打开 `http://<服务器IP>:8080`：
@@ -189,11 +189,11 @@ CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o surveillance-server ./cmd/serv
 目录名不带版本号，升级时**直接在新版压缩包上解压覆盖同名目录**即可：
 
 ```bash
-cd /root    # 假设部署在 /root/surveillance-system-linux-arm64
-cp surveillance-system-linux-arm64/config.yaml /tmp/config.yaml.bak   # ① 备份你的配置
-tar xzf ~/surveillance-system-1.5.0-linux-arm64.tar.gz                # ② 覆盖解压
-cp /tmp/config.yaml.bak surveillance-system-linux-arm64/config.yaml   # ③ 恢复配置
-systemctl restart surveillance-server   # ④ 重启（前台运行则重新 ./surveillance-server）
+cd /root    # 假设部署在 /root/cineye-linux-arm64
+cp cineye-linux-arm64/config.yaml /tmp/config.yaml.bak   # ① 备份你的配置
+tar xzf ~/cineye-1.5.0-linux-arm64.tar.gz                # ② 覆盖解压
+cp /tmp/config.yaml.bak cineye-linux-arm64/config.yaml   # ③ 恢复配置
+systemctl restart cineye   # ④ 重启（前台运行则重新 ./cineye）
 ```
 
 - `data/`（数据库）、`recordings/`（录像）**不在包内，覆盖解压自动保留**
@@ -465,7 +465,7 @@ docker compose --profile nginx up -d          # + Nginx（需先准备 deploymen
 ### 目录结构
 
 ```
-surveillance-system/
+cineye/
 ├── cmd/server/             # 主程序入口
 ├── internal/
 │   ├── api/                # HTTP API 处理、路由注册、环境检测
