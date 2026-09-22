@@ -29,7 +29,7 @@ export default {
       settingsUsers: '用户管理',
     },
     footer: {
-      app: '监控录像系统',
+      app: 'Cineye',
     },
   },
 }

@@ -2,7 +2,7 @@ export default {
   settingsSystem: {
     basicSettings: 'Basic Settings',
     systemName: 'System Name',
-    defaultSystemName: 'Surveillance Video System',
+    defaultSystemName: 'Cineye',
     httpPort: 'HTTP Port',
     wsPort: 'WebSocket Port',
     runMode: 'Run Mode',
@@ -18,6 +18,7 @@ export default {
     sqlitePath: 'SQLite Path',
     pgHost: 'PostgreSQL Host',
     saveSuccess: 'Saved successfully',
+    restartRequired: 'Some settings saved; they take effect after a service restart (port / run mode). Log level applies immediately.',
     saveFailed: 'Save failed',
     dbSaveSuccess: 'SQLite configuration saved successfully (restart required to take effect)',
   },

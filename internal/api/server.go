@@ -436,6 +436,7 @@ func (s *Server) getVersion(c *gin.Context) {
 		"version":   s.version,
 		"buildTime": s.buildTime,
 		"gitCommit": s.gitCommit,
+		"name":      s.cfg.Server.Name,
 	})
 }
 
@@ -2339,15 +2340,73 @@ func (s *Server) sendTestAlert(c *gin.Context) {
 func (s *Server) getSystemConfig(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{
-		"server":  s.cfg.Server,
+		"server": gin.H{
+			"name":      s.cfg.Server.Name,
+			"host":      s.cfg.Server.Host,
+			"http_port": s.cfg.Server.HTTPPort,
+			"ws_port":   s.cfg.Server.WSPort,
+			"mode":      s.cfg.Server.Mode,
+			"log_level": s.cfg.Logging.Level,
+		},
 		"storage": s.cfg.Storage,
 		"camera":  s.cfg.Camera,
 	})
 }
 
 func (s *Server) updateSystemConfig(c *gin.Context) {
+	var req struct {
+		Server struct {
+			Name     string `json:"name"`
+			HTTPPort int    `json:"http_port"`
+			WSPort   int    `json:"ws_port"`
+			Mode     string `json:"mode"`
+			LogLevel string `json:"log_level"`
+		} `json:"server"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+	srv := req.Server
+	if srv.HTTPPort < 1 || srv.HTTPPort > 65535 || srv.WSPort < 1 || srv.WSPort > 65535 {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid port number"})
+		return
+	}
+	if srv.Mode != "" && srv.Mode != "debug" && srv.Mode != "release" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "invalid run mode"})
+		return
+	}
+	if lvl := srv.LogLevel; lvl != "" {
+		if _, err := logrus.ParseLevel(lvl); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid log level"})
+			return
+		}
+	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "config updated"})
+	restartRequired := false
+	if srv.Name != s.cfg.Server.Name {
+		s.cfg.Server.Name = srv.Name
+	}
+	if srv.HTTPPort != s.cfg.Server.HTTPPort || srv.WSPort != s.cfg.Server.WSPort || srv.Mode != s.cfg.Server.Mode {
+		s.cfg.Server.HTTPPort = srv.HTTPPort
+		s.cfg.Server.WSPort = srv.WSPort
+		s.cfg.Server.Mode = srv.Mode
+		restartRequired = true
+	}
+	if srv.LogLevel != s.cfg.Logging.Level {
+		s.cfg.Logging.Level = srv.LogLevel
+		if lvl, err := logrus.ParseLevel(srv.LogLevel); err == nil {
+			logrus.SetLevel(lvl)
+		}
+	}
+
+	if s.cfgPath != "" {
+		if err := s.cfg.Save(s.cfgPath); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to save config: " + err.Error()})
+			return
+		}
+	}
+	c.JSON(http.StatusOK, gin.H{"message": "config updated", "restart_required": restartRequired})
 }
 
 func (s *Server) getSystemInfo(c *gin.Context) {

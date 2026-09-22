@@ -85,12 +85,26 @@ const dbForm = reactive({
 const loadSystemConfig = async () => {
   try {
     const res: any = await api.system.config()
-    Object.assign(systemForm, res.server || {})
+    const srv = res.server || {}
+    if (srv.name === undefined || srv.name === '') {
+      systemForm.name = t('settingsSystem.defaultSystemName')
+    }
+    Object.assign(systemForm, srv)
+    if (!systemForm.name) systemForm.name = t('settingsSystem.defaultSystemName')
     Object.assign(dbForm, res.database || {})
   } catch (e) { console.error(e) }
 }
 
-const saveSystemConfig = async () => { try { await api.system.updateConfig({ server: systemForm }); ElMessage.success(t('settingsSystem.saveSuccess')) } catch(e) { ElMessage.error(t('settingsSystem.saveFailed')) } }
+const saveSystemConfig = async () => {
+  try {
+    const res: any = await api.system.updateConfig({ server: systemForm })
+    if (res?.restart_required) {
+      ElMessage.warning(t('settingsSystem.restartRequired'))
+    } else {
+      ElMessage.success(t('settingsSystem.saveSuccess'))
+    }
+  } catch (e) { ElMessage.error(t('settingsSystem.saveFailed')) }
+}
 const saveDbConfig = async () => { ElMessage.success(t('settingsSystem.dbSaveSuccess')) }
 
 onMounted(() => {

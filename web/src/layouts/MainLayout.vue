@@ -79,9 +79,9 @@
       </el-main>
 
       <el-footer class="app-footer" height="36px">
-        <span class="footer-item">{{ t('layout.footer.app') }}<b v-if="version" class="footer-version"> v{{ version }}</b></span>
-        <a class="footer-item footer-link" href="https://github.com/Assen998/surveillance-system" target="_blank" rel="noopener noreferrer">
-          <el-icon><Link /></el-icon> github.com/Assen998/surveillance-system
+        <span class="footer-item">{{ sysName || t('layout.footer.app') }}<b v-if="version" class="footer-version"> v{{ version }}</b></span>
+        <a class="footer-item footer-link" href="https://github.com/Assen998/cineye" target="_blank" rel="noopener noreferrer">
+          <el-icon><Link /></el-icon> github.com/Assen998/cineye
         </a>
       </el-footer>
     </el-container>
@@ -111,11 +111,13 @@ const userName = 'admin'
 
 
 const version = ref('')
+const sysName = ref('')
 onMounted(async () => {
   try {
     const res = await fetch('/api/version')
     const d = await res.json()
     version.value = d?.version || ''
+    sysName.value = d?.name || ''
   } catch (e) {
 
   }

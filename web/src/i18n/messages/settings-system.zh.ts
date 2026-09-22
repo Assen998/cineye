@@ -2,7 +2,7 @@ export default {
   settingsSystem: {
     basicSettings: '基本设置',
     systemName: '系统名称',
-    defaultSystemName: '监控录像系统',
+    defaultSystemName: 'Cineye',
     httpPort: 'HTTP 端口',
     wsPort: 'WebSocket 端口',
     runMode: '运行模式',
@@ -18,6 +18,7 @@ export default {
     sqlitePath: 'SQLite 路径',
     pgHost: 'PostgreSQL 主机',
     saveSuccess: '保存成功',
+    restartRequired: '部分设置已保存，需重启服务后生效（端口/运行模式）。日志级别即时生效。',
     saveFailed: '保存失败',
     dbSaveSuccess: 'SQLite 配置保存成功（需重启生效）',
   },

@@ -28,6 +28,7 @@ type UpdateConfig struct {
 }
 
 type ServerConfig struct {
+	Name     string `mapstructure:"name" yaml:"name"`
 	Host     string `mapstructure:"host" yaml:"host"`
 	HTTPPort int    `mapstructure:"http_port" yaml:"http_port"`
 	WSPort   int    `mapstructure:"ws_port" yaml:"ws_port"`
