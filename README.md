@@ -454,7 +454,7 @@ docker compose --profile minio up -d          # + MinIO（9000 API / 9001 控制
 docker compose --profile nginx up -d          # + Nginx（需先准备 deployments/ssl/ 证书）
 ```
 
-数据持久化在 `surveillance-data` / `surveillance-recordings` / `surveillance-logs` 三个命名卷中，容器内路径 `/app/data`、`/app/recordings`、`/app/logs`。
+数据持久化在 `cineye-data` / `cineye-recordings` / `cineye-logs` 三个命名卷中，容器内路径 `/app/data`、`/app/recordings`、`/app/logs`。
 
 > 系统默认无需 Redis / PostgreSQL 即可运行（SQLite 纯 Go 驱动）；MinIO 仅在配置了对象存储时才需要。
 

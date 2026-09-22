@@ -1,4 +1,4 @@
-# Surveillance System
+# Cineye
 
 A video surveillance and recording management system built with Go + Vue 3, supporting multi-camera access, live preview, playback, recording storage, alert push and user permission management.
 
@@ -111,41 +111,41 @@ sudo dnf install -y ffmpeg
 **One-liner install** (no clone needed; the script first asks for the language, then for the ports on first install):
 
 ```bash
-curl -fsSL https://raw.githubusercontent.com/Assen998/surveillance-system/main/deployments/deploy.sh | sudo bash
+curl -fsSL https://raw.githubusercontent.com/Assen998/cineye/main/deployments/deploy.sh | sudo bash
 ```
 
 Or clone the repository and run it (same effect, convenient for inspecting the script):
 
 ```bash
-git clone https://github.com/Assen998/surveillance-system.git
-cd surveillance-system
+git clone https://github.com/Assen998/cineye.git
+cd cineye
 sudo bash deployments/deploy.sh        # auto-downloads the latest release asset for your platform
 # Install a local binary instead:
-sudo bash deployments/deploy.sh /path/to/surveillance-server
-# Uninstall (data is kept; remove /opt/surveillance manually to wipe it):
+sudo bash deployments/deploy.sh /path/to/cineye
+# Uninstall (data is kept; remove /opt/cineye manually to wipe it):
 sudo bash deployments/deploy.sh --uninstall
 ```
 
 - Auto-detects the architecture (amd64 / arm64 / armv7) and downloads the matching latest-release asset
 - **Custom ports on first install**: the script prompts for the HTTP port (default `8080`) and WebSocket port (default `8081`), validates them (range + not already in use) and writes them into the generated `config.yaml`; with an existing config it asks nothing and changes nothing
-- Installs to `/opt/surveillance`; generates `config.yaml` on first install — **an existing config is always preserved, never overwritten**
-- Creates the `surveillance` systemd service: starts on boot, auto-restarts on crash
+- Installs to `/opt/cineye`; generates `config.yaml` on first install — **an existing config is always preserved, never overwritten**
+- Creates the `cineye` systemd service: starts on boot, auto-restarts on crash
 - If GitHub is not reachable directly, download via a proxy: `sudo env http_proxy=http://<proxy-host>:<port> https_proxy=http://<proxy-host>:<port> bash deployments/deploy.sh` (for the one-liner, prefix `curl` with the same `http_proxy=...`)
 - Non-interactive (piped/CI) runs auto-detect the system locale; force a language with `DEPLOY_LANG=zh|en`; ports can be set with `SURVEILLANCE_HTTP_PORT` / `SURVEILLANCE_WS_PORT`
 
 ### Option 2: Download a Release (no build needed)
 
-Grab the archive for your platform from [GitHub Releases](https://github.com/Assen998/surveillance-system/releases) (e.g. `surveillance-system-1.5.0-linux-arm64.tar.gz`). It extracts to a **version-less stable directory** (e.g. `surveillance-system-linux-arm64/`):
+Grab the archive for your platform from [GitHub Releases](https://github.com/Assen998/cineye/releases) (e.g. `cineye-1.5.0-linux-arm64.tar.gz`). It extracts to a **version-less stable directory** (e.g. `cineye-linux-arm64/`):
 
 ```
-surveillance-server         # single binary (frontend embedded)
+cineye         # single binary (frontend embedded)
 config.yaml                 # default configuration
 README.md
 ```
 
 ```bash
-cd surveillance-system-linux-arm64
-./surveillance-server        # auto-loads config.yaml in the same directory
+cd cineye-linux-arm64
+./cineye        # auto-loads config.yaml in the same directory
 ```
 
 ### Option 3: Build from Source
@@ -153,25 +153,25 @@ cd surveillance-system-linux-arm64
 The frontend build is embedded into the backend binary via Go's `go:embed`, producing a **single executable**:
 
 ```bash
-cd surveillance-system
+cd cineye
 
 # 1) Build the frontend first (generates web/dist for go:embed)
 cd web && npm install && npm run build && cd ..
 
 # 2) Build the backend (embeds the frontend → single binary)
-go build -o surveillance-server ./cmd/server
+go build -o cineye ./cmd/server
 ```
 
 Cross-compilation (zero CGO, fully static; linux/windows/darwin × amd64/arm64, etc.):
 
 ```bash
-CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o surveillance-server ./cmd/server
+CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o cineye ./cmd/server
 ```
 
 ### First Run (important)
 
 ```bash
-./surveillance-server
+./cineye
 ```
 
 Open `http://<server-ip>:8080` in the browser:
@@ -191,11 +191,11 @@ Open `http://<server-ip>:8080` in the browser:
 The directory name carries no version, so upgrading is just **extract the new archive over the same directory**:
 
 ```bash
-cd /root    # assuming deployment is /root/surveillance-system-linux-arm64
-cp surveillance-system-linux-arm64/config.yaml /tmp/config.yaml.bak   # ① back up your config
-tar xzf ~/surveillance-system-1.5.0-linux-arm64.tar.gz                # ② extract over it
-cp /tmp/config.yaml.bak surveillance-system-linux-arm64/config.yaml   # ③ restore config
-systemctl restart surveillance-server   # ④ restart (or relaunch ./surveillance-server)
+cd /root    # assuming deployment is /root/cineye-linux-arm64
+cp cineye-linux-arm64/config.yaml /tmp/config.yaml.bak   # ① back up your config
+tar xzf ~/cineye-1.5.0-linux-arm64.tar.gz                # ② extract over it
+cp /tmp/config.yaml.bak cineye-linux-arm64/config.yaml   # ③ restore config
+systemctl restart cineye   # ④ restart (or relaunch ./cineye)
 ```
 
 - `data/` (database) and `recordings/` (recordings) are **not in the archive** — extracting over keeps them automatically
@@ -456,7 +456,7 @@ docker compose --profile minio up -d          # + MinIO (9000 API / 9001 console
 docker compose --profile nginx up -d          # + Nginx (prepare deployments/ssl/ certs first)
 ```
 
-Data is persisted in the named volumes `surveillance-data` / `surveillance-recordings` / `surveillance-logs`, mounted at `/app/data`, `/app/recordings`, `/app/logs` inside the container.
+Data is persisted in the named volumes `cineye-data` / `cineye-recordings` / `cineye-logs`, mounted at `/app/data`, `/app/recordings`, `/app/logs` inside the container.
 
 > The system runs out of the box without Redis / PostgreSQL (pure-Go SQLite driver); MinIO is only needed when object storage is configured.
 
@@ -467,7 +467,7 @@ Data is persisted in the named volumes `surveillance-data` / `surveillance-recor
 ### Directory Layout
 
 ```
-surveillance-system/
+cineye/
 ├── cmd/server/             # entrypoint
 ├── internal/
 │   ├── api/                # HTTP API handlers, routing, environment checks
