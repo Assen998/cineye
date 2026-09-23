@@ -166,6 +166,40 @@ go build -o cineye ./cmd/server
 CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o cineye ./cmd/server
 ```
 
+### 卸载
+
+按你的安装方式选择对应命令。**默认保留数据（配置/录像），如需彻底删除请最后一步手动 `rm -rf`**——执行前请确认已备份。
+
+**方式一（systemd 一键安装）：**
+
+```bash
+# 停止并移除服务（数据保留在 /opt/cineye）
+sudo bash deployments/deploy.sh --uninstall
+# 没有脚本时的等效命令：
+sudo systemctl stop cineye && sudo systemctl disable cineye
+sudo rm /etc/systemd/system/cineye.service && sudo systemctl daemon-reload
+# 彻底删除（含数据/录像/配置）：
+sudo rm -rf /opt/cineye
+```
+
+**方式二 / 方式三（二进制直接运行）：**
+
+```bash
+# 停止进程（前台运行直接 Ctrl+C）
+pkill -x cineye
+# 删除安装目录（目录内 data/、recordings/ 一并删除）
+rm -rf /path/to/cineye-linux-arm64    # 换成你的实际安装目录
+```
+
+**Docker 部署：**
+
+```bash
+cd deployments
+docker compose down          # 停止并移除容器（含 MinIO/Nginx，如启用），数据卷保留
+docker compose down -v       # 连数据卷一起删除（配置/录像/日志全部清除）
+rm -rf <项目目录>             # 可选：删除部署文件
+```
+
 ### 首次运行（重要）
 
 ```bash

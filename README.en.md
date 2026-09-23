@@ -168,6 +168,40 @@ Cross-compilation (zero CGO, fully static; linux/windows/darwin × amd64/arm64, 
 CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o cineye ./cmd/server
 ```
 
+### Uninstall
+
+Pick the commands matching your installation method. **Data (config / recordings) is kept by default — use the final `rm -rf` step only if you want a complete removal**, and make sure you have a backup first.
+
+**Option 1 (systemd one-click install):**
+
+```bash
+# Stop and remove the service (data is kept in /opt/cineye)
+sudo bash deployments/deploy.sh --uninstall
+# Equivalent commands without the script:
+sudo systemctl stop cineye && sudo systemctl disable cineye
+sudo rm /etc/systemd/system/cineye.service && sudo systemctl daemon-reload
+# Complete removal (including data / recordings / config):
+sudo rm -rf /opt/cineye
+```
+
+**Option 2 / Option 3 (running the binary directly):**
+
+```bash
+# Stop the process (Ctrl+C if running in the foreground)
+pkill -x cineye
+# Remove the install directory (data/ and recordings/ inside are removed too)
+rm -rf /path/to/cineye-linux-arm64    # replace with your actual install dir
+```
+
+**Docker deployment:**
+
+```bash
+cd deployments
+docker compose down          # stop and remove containers (incl. MinIO/Nginx if enabled); named volumes are kept
+docker compose down -v       # also delete the named volumes (config / recordings / logs wiped)
+rm -rf <project-dir>         # optional: remove the deployment files
+```
+
 ### First Run (important)
 
 ```bash
