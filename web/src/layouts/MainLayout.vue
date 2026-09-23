@@ -3,7 +3,7 @@
     <el-aside :width="isCollapse ? '64px' : '240px'" class="sidebar">
       <div class="logo-container">
         <el-icon class="logo-icon" v-if="!isCollapse"><VideoCamera /></el-icon>
-        <span v-if="!isCollapse" class="logo-text">{{ t('layout.system') }}</span>
+        <span v-if="!isCollapse" class="logo-text">{{ sysName || t('layout.footer.app') }}</span>
       </div>
       <el-menu
         :default-active="activeMenu"
@@ -164,7 +164,7 @@ const activeMenu = computed(() => {
 const pageTitle = computed(() => {
   const matched = route.matched[route.matched.length - 1]
   const title = matched?.meta?.title as string
-  return title ? t(title) : t('layout.system')
+  return title ? t(title) : (sysName.value || t('layout.footer.app'))
 })
 
 const logout = () => {
